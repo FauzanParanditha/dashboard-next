@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-const KYCPage: React.FC = () => {
+const KYCPage = () => {
   useEffect(() => {
     const startPersonaVerification = () => {
       if (!window.Persona) {
@@ -22,7 +22,9 @@ const KYCPage: React.FC = () => {
         environmentId: "env_qkeDqMLeK3PpghPSa3ubvgBMmJzw",
         onReady: () => client.open(),
         onComplete: ({ inquiryId, status, fields }: any) => {
-          console.log(`Completed inquiry ${inquiryId} with status ${status}`);
+          console.log(
+            `Completed inquiry ${inquiryId} with status ${status} fields ${fields}`
+          );
           // Handle the completion of the verification here
         },
       });
