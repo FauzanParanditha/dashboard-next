@@ -4,7 +4,7 @@ import Head from "next/head";
 import useSWR from "swr";
 import { useEffect, useState } from "react";
 
-const adminHome = () => {
+const AdminHome = () => {
   const [empty, setEmpty] = useState(true);
 
   const { data: dashboard, mutate: revalidate } = useSWR(`/adm/dashboard`);
@@ -62,4 +62,4 @@ const adminHome = () => {
   );
 };
 
-export default adminHome;
+export default AdminHome;
