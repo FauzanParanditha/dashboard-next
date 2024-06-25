@@ -22,9 +22,8 @@ const KYCPage = () => {
         environmentId: "env_qkeDqMLeK3PpghPSa3ubvgBMmJzw",
         onReady: () => client.open(),
         onComplete: ({ inquiryId, status, fields }: any) => {
-          console.log(
-            `Completed inquiry ${inquiryId} with status ${status} fields ${fields}`
-          );
+          console.log(`Completed inquiry ${inquiryId} with status ${status}`);
+          console.log("Verified fields:", fields);
           // Handle the completion of the verification here
         },
       });
