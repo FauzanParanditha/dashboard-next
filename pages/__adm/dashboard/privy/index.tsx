@@ -23,11 +23,9 @@ const PrivyPage = () => {
       setIsLoading(true);
       const base_url = process.env.NEXT_PUBLIC_PERSONA_URL;
       console.log(`${base_url}/oauth2/api/v1/token`);
-      api()
-        .get(`${base_url}/oauth2/api/v1/token`)
-        .then((res) => {
-          console.log(res);
-        });
+      axios.get(`${base_url}/oauth2/api/v1/token`).then((res) => {
+        console.log(res);
+      });
       // axios
       //   .post(`${base_url}/oauth2/api/v1/token`, {
       //     client_id: "Pandi",
