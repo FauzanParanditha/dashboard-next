@@ -29,11 +29,6 @@ export const admin = [
     link: "/dashboard/admin",
   },
   {
-    title: "Privy",
-    icon: <FcPortraitMode />,
-    link: "/dashboard/privy",
-  },
-  {
     title: "Logs",
     icon: <FcNook />,
     link: "#",
