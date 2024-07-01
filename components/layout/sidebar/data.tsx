@@ -10,6 +10,7 @@ import {
   FcNook,
   FcBarChart,
   FcFeedback,
+  FcVip,
 } from "react-icons/fc";
 
 export const admin = [
@@ -27,6 +28,11 @@ export const admin = [
     title: "Admin",
     icon: <FcPortraitMode />,
     link: "/dashboard/admin",
+  },
+  {
+    title: "Privy",
+    icon: <FcVip />,
+    link: "/dashboard/privy",
   },
   {
     title: "Logs",

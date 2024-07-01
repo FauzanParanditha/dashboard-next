@@ -37,6 +37,7 @@ export const adminJwtMiddleware = (
       "/api/adm/telegram",
       "/api/adm/auth/forgot-password",
       "/api/adm/auth/reset-password",
+      "/api/callback",
     ],
   });
   return util.promisify(middleware)(req, res);
