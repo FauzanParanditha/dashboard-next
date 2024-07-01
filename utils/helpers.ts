@@ -19,7 +19,7 @@ export const generateReferenceNumber = () => {
 
 export const verifySignature = (req: NextApiRequest, secret: string) => {
   const signature = req.headers["x-signature"] as string;
-  console.log(signature);
+  // console.log(signature);
 
   const jsonBody = JSON.stringify(req.body).replace(/\s/g, "");
   const bodyMd5 = CryptoJS.MD5(jsonBody).toString(CryptoJS.enc.Base64);
@@ -29,6 +29,6 @@ export const verifySignature = (req: NextApiRequest, secret: string) => {
 
   const hash = btoa(hmacBase64);
 
-  console.log(hash);
+  // console.log(hash);
   return hash === signature;
 };
