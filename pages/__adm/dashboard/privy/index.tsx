@@ -25,10 +25,8 @@ const PrivyPage = () => {
   const [empty, setEmpty] = useState(true);
   const { user } = useUserContext();
   let accessToken = "";
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
-  const [modalUrl, setModalUrl] = useState(""); // State to store URL for the modal
-
-  const url = process.env.NEXT_PUBLIC_PRIVY_URL;
+  const [showModal, setShowModal] = useState(false);
+  const [modalUrl, setModalUrl] = useState("");
 
   const { data: privys, mutate: revalidate } = useSWR(
     `/adm/privy?perPage=${10}&page=${page}&search=${search}`
@@ -147,8 +145,9 @@ const PrivyPage = () => {
       );
 
       if (resRegis.status === 201) {
-        setModalUrl(resRegis.data.data.registration_url);
-        setShowModal(true);
+        window.open(resRegis.data.data.registration_url)
+        // setModalUrl(resRegis.data.data.registration_url);
+        // setShowModal(true);
         setIsLoading(false);
       }
     } catch (errRegis: any) {
@@ -160,10 +159,6 @@ const PrivyPage = () => {
 
   const openModal = () => {
     setShowModal(true);
-  };
-  const closeModal = () => {
-    setShowModal(false);
-    setModalUrl("");
   };
 
   const privyHandler = async () => {
@@ -301,9 +296,9 @@ const PrivyPage = () => {
               </div>
             )}
             <Modal
-              show={showModal}
+              isOpen={showModal}
+              setIsOpen={setShowModal}
               url={"https://dev.dcid.io/7cedb7e0d9"}
-              onClose={closeModal}
             />
           </div>
         </div>
