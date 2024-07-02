@@ -18,8 +18,8 @@ const KYCPage = () => {
       }
 
       const client = new window.Persona.Client({
-        templateId: "itmpl_jB5zUZAq2iG2SGZe9QFUAFm3nvee",
-        environmentId: "env_qkeDqMLeK3PpghPSa3ubvgBMmJzw",
+        templateId: process.env.NEXT_PUBLIC_TEMPLATE_PP,
+        environmentId: process.env.NEXT_PUBLIC_ENVIRONMENTID,
         onReady: () => client.open(),
         onComplete: ({ inquiryId, status, fields }: any) => {
           console.log(`Completed inquiry ${inquiryId} with status ${status}`);

@@ -15,6 +15,7 @@ import useSWR from "swr";
 import Link from "next/link";
 import clsx from "clsx";
 import Pagination from "@/components/pagination";
+import Modal from "@/components/dashboard/privy/modalPrivy";
 
 // pages/kyc.tsx
 const PrivyPage = () => {
@@ -24,6 +25,9 @@ const PrivyPage = () => {
   const [empty, setEmpty] = useState(true);
   const { user } = useUserContext();
   let accessToken = "";
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [modalUrl, setModalUrl] = useState(""); // State to store URL for the modal
+
   const url = process.env.NEXT_PUBLIC_PRIVY_URL;
 
   const { data: privys, mutate: revalidate } = useSWR(
@@ -38,11 +42,7 @@ const PrivyPage = () => {
 
   useEffect(() => {
     if (privys !== undefined) {
-      if (privys?.data?.data?.length !== 0) {
-        setEmpty(false);
-      } else {
-        setEmpty(true);
-      }
+      setEmpty(privys?.data?.data?.length === 0);
     }
   }, [privys]);
 
@@ -78,53 +78,45 @@ const PrivyPage = () => {
   };
 
   const fetchAccessToken = async () => {
-    console.log("fetch token");
-    let data = JSON.stringify({
+    setIsLoading(true);
+
+    const data = {
       client_id: process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID,
       client_secret: process.env.NEXT_PUBLIC_PRIVY_CLIENT_SECRET,
       grant_type: "client_credentials",
-    });
+    };
 
-    //token
-    console.log("post");
-    await axios
-      .post(`/api/oauth2/api/v1/token`, data, {
+    try {
+      const resToken = await axios.post(`/api/oauth2/api/v1/token`, data, {
         maxBodyLength: Infinity,
         headers: {
           "Content-Type": "application/json",
           // Authorization: `Basic ${process.env.NEXT_PUBLIC_PRIVY_AUTH}`,
         },
-      })
-      .then((resToken) => {
-        console.log("Res");
-        if (resToken.status == 200 || resToken.status == 201) {
-          console.log("success");
-          accessToken = resToken.data.data.access_token;
-          return accessToken;
-        }
-      })
-      .catch((errToken) => {
-        handleAxiosError(`Error Token: ${errToken}`);
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
+
+      if (resToken.status === 200 || resToken.status === 201) {
+        accessToken = resToken.data.data.access_token;
+        setIsLoading(false);
+      }
+    } catch (errToken) {
+      handleAxiosError(`Error Token: ${errToken}`);
+      setIsLoading(false);
+    }
   };
 
   const fetchRegister = async () => {
     setIsLoading(true);
-    console.log("fetch register");
 
     await fetchAccessToken();
 
     const timestamp = moment().toString();
-
     const referenceNumber = generateReferenceNumber();
     const apiKey = process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID;
     const secretKey = process.env.NEXT_PUBLIC_PRIVY_CLIENT_SECRET;
     const channelId = process.env.NEXT_PUBLIC_PRIVY_CHANNEL_ID;
 
-    let secondData = {
+    const secondData = {
       reference_number: referenceNumber,
       channel_id: channelId,
       info: "RANDOMSTRING",
@@ -138,38 +130,48 @@ const PrivyPage = () => {
       channelId,
       secondData
     );
-    console.log("signature");
 
-    axios
-      .post(`/api/web/api/v2/register`, secondData, {
-        maxContentLength: Infinity,
-        headers: {
-          Timestamp: timestamp,
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-          Signature: signature,
-        },
-      })
-      .then((resRegis) => {
-        if (resRegis.status == 201) {
-          window.open(resRegis.data.data.registration_url, "_blank");
-          setIsLoading(false);
+    try {
+      const resRegis = await axios.post(
+        `/api/web/api/v2/register`,
+        secondData,
+        {
+          maxContentLength: Infinity,
+          headers: {
+            Timestamp: timestamp,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+            Signature: signature,
+          },
         }
-      })
-      .catch((errRegis) => {
-        toast.error(errRegis.message);
-        handleAxiosError(`Error Regis: ${errRegis}`);
-      });
+      );
+
+      if (resRegis.status === 201) {
+        setModalUrl(resRegis.data.data.registration_url);
+        setShowModal(true);
+        setIsLoading(false);
+      }
+    } catch (errRegis: any) {
+      toast.error(errRegis.message);
+      handleAxiosError(`Error Regis: ${errRegis}`);
+      setIsLoading(false);
+    }
+  };
+
+  const openModal = () => {
+    setShowModal(true);
+  };
+  const closeModal = () => {
+    setShowModal(false);
+    setModalUrl("");
   };
 
   const privyHandler = async () => {
     try {
       setIsLoading(true);
-      const response = await fetchRegister();
-      // You can now use the access token to make authorized requests
+      await fetchRegister();
     } catch (error) {
       console.error("Error:", error);
-      // Handle the error as needed
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +195,7 @@ const PrivyPage = () => {
               <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                 <button
                   type="button"
-                  onClick={privyHandler}
+                  onClick={openModal}
                   className="flex items-center justify-center gap-2 rounded-md bg-cyan-600 px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-cyan-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
                 >
                   Add KYC
@@ -298,6 +300,11 @@ const PrivyPage = () => {
                 />
               </div>
             )}
+            <Modal
+              show={showModal}
+              url={"https://dev.dcid.io/7cedb7e0d9"}
+              onClose={closeModal}
+            />
           </div>
         </div>
       </DashboardLayout>
